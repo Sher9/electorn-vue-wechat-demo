@@ -7,4 +7,5 @@ logs/
 .env
 .env.local
 .DS_Store
+.history
 *.log
