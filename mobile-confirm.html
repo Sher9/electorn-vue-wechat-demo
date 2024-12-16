@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>确认登录</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .confirm-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .device-info {
+            background: #f7f7f7;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .device-info p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            height: 44px;
+            border: none;
+            background: #07c160;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            height: 44px;
+            border: 1px solid #ddd;
+            background: #fff;
+            color: #333;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="confirm-card">
+            <img src="./public/images/logo.png" alt="Logo" class="logo">
+            <h2 class="title">确认登录</h2>
+            <p class="subtitle">WeChat Desktop 正在请求登录</p>
+
+            <div class="device-info">
+                <p>设备信息：WeChat Desktop</p>
+                <p>登录地点：本地登录</p>
+                <p>登录时间：<span id="loginTime"></span></p>
+            </div>
+
+            <button class="confirm-btn" onclick="confirmLogin()">确认登录</button>
+            <button class="cancel-btn" onclick="cancelLogin()">取消</button>
+        </div>
+    </div>
+
+    <div id="loading" class="loading">
+        确认中...
+    </div>
+
+    <script>
+        // 获取URL参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const serverUrl = urlParams.get('serverUrl') 
+        // 更新登录时间
+        document.getElementById('loginTime').textContent = new Date().toLocaleString();
+
+        // 确认登录
+        async function confirmLogin() {
+            if (!code) {
+                alert('无效的二维码');
+                return;
+            }
+
+            try {
+                document.getElementById('loading').style.display = 'flex';
+                // 修改请求地址为本机IP
+                const response = await fetch(`${serverUrl}/api/user/qrcode/confirm/${code}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.code === 200) {
+                    alert('确认成功');
+                    window.close();
+                } else {
+                    throw new Error(data.message || '确认失败');
+                }
+            } catch (error) {
+                alert(error.message || '确认失败');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // 取消登录
+        function cancelLogin() {
+            window.close();
+        }
+    </script>
+</body>
+
+</html>

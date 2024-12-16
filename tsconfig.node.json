@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "CommonJS", // 修改这里
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "types": [
+      "node",
+      "electron"
+    ]
+  },
+  "include": [
+    "vite.config.ts",
+    "electron"
+  ]
+}
